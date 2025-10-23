@@ -3,12 +3,12 @@ session_start();
 require __DIR__ . '/../config/database.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    $login_id = $_POST['login_id'];
     $password = $_POST['password'];
 
-    // 1. Cari user berdasarkan username
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
+    // 1. Cari user berdasarkan login_id (NIM/NIP/Username)
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE login_id = ?");
+    $stmt->execute([$login_id]);
     $user = $stmt->fetch();
 
     // 2. Verifikasi user dan password (MENGGUNAKAN MD5)
@@ -18,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['role'] = $user['role'];
         
         // 3. Arahkan berdasarkan role
-        if ($user['role'] == 'dosen') {
+        if ($user['role'] == 'superadmin') {
+            header("Location: ../superadmin/index.php");
+        } elseif ($user['role'] == 'dosen') {
             header("Location: ../dosen/index.php");
         } else {
             header("Location: ../mahasiswa/index.php");

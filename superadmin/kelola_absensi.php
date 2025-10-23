@@ -1,10 +1,9 @@
 <?php
 require __DIR__ . '/../templates/header.php';
-check_auth('dosen'); // Cek Dosen
+check_auth('superadmin'); // Cek Super Admin
 
 $error = '';
 $success = '';
-$id_dosen_login = $current_user['id_dosen']; // Ambil ID Dosen yang login
 
 // Logika "UPSERT" (Update atau Insert)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
@@ -12,84 +11,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
     $id_mk = $_POST['id_mk'];
     $mahasiswa_data = $_POST['mahasiswa'];
 
-    // Validasi ekstra: Cek apakah dosen ini benar-benar mengampu MK ini
-    $stmt_cek = $pdo->prepare("SELECT id_mk FROM mata_kuliah WHERE id_mk = ? AND id_dosen_pengampu = ?");
-    $stmt_cek->execute([$id_mk, $id_dosen_login]);
-    if (!$stmt_cek->fetch()) {
-        $error = "Anda tidak berhak mengubah absensi mata kuliah ini.";
-    } else {
-        $pdo->beginTransaction();
-        try {
-            foreach ($mahasiswa_data as $id_mahasiswa => $data) {
-                $status = $data['status'];
-                $keterangan = $data['keterangan'];
-                $id_absensi = $data['id_absensi']; 
+    $pdo->beginTransaction();
+    try {
+        foreach ($mahasiswa_data as $id_mahasiswa => $data) {
+            $status = $data['status'];
+            $keterangan = $data['keterangan'];
+            $id_absensi = $data['id_absensi']; // Bisa kosong jika data baru
 
-                if (empty($status)) continue;
+            if (empty($status)) continue; // Lewati jika status tidak diisi
 
-                if (empty($id_absensi)) {
-                    $stmt_insert = $pdo->prepare(
-                        "INSERT INTO absensi (id_mahasiswa, id_mk, tanggal_absensi, status, keterangan) 
-                         VALUES (?, ?, ?, ?, ?)"
-                    );
-                    $stmt_insert->execute([$id_mahasiswa, $id_mk, $tanggal, $status, $keterangan]);
-                } else {
-                    $stmt_update = $pdo->prepare(
-                        "UPDATE absensi SET status = ?, keterangan = ? 
-                         WHERE id_absensi = ?"
-                    );
-                    $stmt_update->execute([$status, $keterangan, $id_absensi]);
-                }
+            if (empty($id_absensi)) {
+                // INSERT baru
+                $stmt_insert = $pdo->prepare(
+                    "INSERT INTO absensi (id_mahasiswa, id_mk, tanggal_absensi, status, keterangan) 
+                     VALUES (?, ?, ?, ?, ?)"
+                );
+                $stmt_insert->execute([$id_mahasiswa, $id_mk, $tanggal, $status, $keterangan]);
+            } else {
+                // UPDATE yang ada
+                $stmt_update = $pdo->prepare(
+                    "UPDATE absensi SET status = ?, keterangan = ? 
+                     WHERE id_absensi = ?"
+                );
+                $stmt_update->execute([$status, $keterangan, $id_absensi]);
             }
-            $pdo->commit();
-            $success = "Data absensi berhasil disimpan!";
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            $error = "Gagal menyimpan data: " . $e->getMessage();
         }
+        $pdo->commit();
+        $success = "Data absensi berhasil disimpan!";
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $error = "Gagal menyimpan data: " . $e->getMessage();
     }
 }
 
 // Ambil filter (jika ada)
-$filter_tanggal = $_GET['tanggal'] ?? date('Y-m-d');
+$filter_tanggal = $_GET['tanggal'] ?? date('Y-m-d'); // Default hari ini
 $filter_mk = $_GET['id_mk'] ?? '';
 
 // Ambil daftar MK untuk filter
-// INI PERBEDAANNYA: Ambil HANYA MK yang diampu dosen ini
-$stmt_mk_list = $pdo->prepare("SELECT * FROM mata_kuliah WHERE id_dosen_pengampu = ? ORDER BY nama_mk");
-$stmt_mk_list->execute([$id_dosen_login]);
+// INI PERBEDAANNYA: Ambil SEMUA mata kuliah
+$stmt_mk_list = $pdo->query("SELECT * FROM mata_kuliah ORDER BY nama_mk");
 $mk_list = $stmt_mk_list->fetchAll();
 
 $absensi_list = [];
 if (!empty($filter_mk) && !empty($filter_tanggal)) {
-    // Validasi lagi, pastikan $filter_mk adalah milik dosen ini
-    $is_my_mk = false;
-    foreach ($mk_list as $mk) {
-        if ($mk['id_mk'] == $filter_mk) $is_my_mk = true;
-    }
-
-    if ($is_my_mk) {
-        $stmt_absensi = $pdo->prepare("
-            SELECT 
-                m.id_mahasiswa, m.nim, m.nama_lengkap,
-                a.id_absensi, a.status, a.keterangan
-            FROM peserta_mk p
-            JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
-            LEFT JOIN absensi a ON p.id_mahasiswa = a.id_mahasiswa 
-                               AND p.id_mk = a.id_mk 
-                               AND a.tanggal_absensi = ?
-            WHERE p.id_mk = ?
-            ORDER BY m.nama_lengkap
-        ");
-        $stmt_absensi->execute([$filter_tanggal, $filter_mk]);
-        $absensi_list = $stmt_absensi->fetchAll();
-    } else {
-        $error = "Mata kuliah tidak valid.";
-    }
+    // Kueri utama: Ambil semua peserta MK, lalu LEFT JOIN absensi
+    $stmt_absensi = $pdo->prepare("
+        SELECT 
+            m.id_mahasiswa, m.nim, m.nama_lengkap,
+            a.id_absensi, a.status, a.keterangan
+        FROM peserta_mk p
+        JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa
+        LEFT JOIN absensi a ON p.id_mahasiswa = a.id_mahasiswa 
+                           AND p.id_mk = a.id_mk 
+                           AND a.tanggal_absensi = ?
+        WHERE p.id_mk = ?
+        ORDER BY m.nama_lengkap
+    ");
+    $stmt_absensi->execute([$filter_tanggal, $filter_mk]);
+    $absensi_list = $stmt_absensi->fetchAll();
 }
 ?>
 
-<h2>Kelola Absensi Mata Kuliah Anda</h2>
+<h2>Kelola Absensi Mahasiswa (Akses Super Admin)</h2>
 <hr>
 
 <?php if ($error): ?>
@@ -105,7 +89,7 @@ if (!empty($filter_mk) && !empty($filter_tanggal)) {
         <input type="date" name="tanggal" id="tanggal" value="<?= htmlspecialchars($filter_tanggal) ?>" class="form-control">
     </div>
     <div class="form-group" style="margin-bottom: 0;">
-        <label for="id_mk">Mata Kuliah Anda</label>
+        <label for="id_mk">Mata Kuliah</label>
         <select name="id_mk" id="id_mk" class="form-control" required>
             <option value="">-- Pilih Mata Kuliah --</option>
             <?php foreach ($mk_list as $mk): ?>
@@ -160,8 +144,6 @@ if (!empty($filter_mk) && !empty($filter_tanggal)) {
     </form>
 <?php elseif (empty($filter_mk)): ?>
     <p>Silakan pilih mata kuliah dan tanggal untuk menampilkan data.</p>
-<?php elseif (empty($mk_list)): ?>
-    <p>Anda tidak mengampu mata kuliah apapun.</p>
 <?php else: ?>
     <p>Tidak ada mahasiswa yang terdaftar di mata kuliah ini.</p>
 <?php endif; ?>

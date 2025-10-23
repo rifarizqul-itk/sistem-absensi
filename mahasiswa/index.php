@@ -10,7 +10,6 @@ check_auth('mahasiswa');
 <hr>
 <p>Selamat datang, <strong><?= htmlspecialchars($current_user['nama_lengkap']) ?></strong>!</p>
 <p>NIM: <?= htmlspecialchars($current_user['nim']) ?></p>
-<p>Program Studi: <?= htmlspecialchars($current_user['nama_prodi'] ?? 'N/A') ?></p>
 
 
 <p>Silakan pilih menu untuk mengisi absensi atau melihat riwayat absensi Anda.</p>
