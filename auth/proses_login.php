@@ -19,9 +19,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // 3. Arahkan berdasarkan role
         if ($user['role'] == 'dosen') {
-            header("Location: /sistem-absensi/dosen/index.php");
+            header("Location: ../dosen/index.php");
         } else {
-            header("Location: /sistem-absensi/mahasiswa/index.php");
+            header("Location: ../mahasiswa/index.php");
         }
         exit;
     } else {

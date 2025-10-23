@@ -33,12 +33,12 @@ function check_auth($role = null) {
     global $current_role;
     // Jika tidak login, tendang ke login
     if (!$current_role) {
-        header("Location: /sistem-absensi/auth/login.php?error=not_logged_in");
+        header("Location: ../auth/login.php?error=not_logged_in");
         exit;
     }
     // Jika role spesifik diperlukan dan tidak cocok, tendang
     if ($role && $current_role != $role) {
-        header("Location: /sistem-absensi/auth/login.php?error=unauthorized");
+        header("Location: ../auth/login.php?error=unauthorized");
         exit;
     }
 }
@@ -50,29 +50,29 @@ function check_auth($role = null) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Absensi Mahasiswa</title>
-    <link rel="stylesheet" href="/sistem-absensi/assets/style.css">
+    <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
 
 <nav>
     <div>
         <?php if ($current_role == 'dosen'): ?>
-            <a href="/sistem-absensi/dosen/index.php">Dashboard</a>
-            <a href="/sistem-absensi/dosen/kelola_mahasiswa.php">Kelola Mahasiswa</a>
-            <a href="/sistem-absensi/dosen/kelola_mk.php">Kelola MatKul</a>
-            <a href="/sistem-absensi/dosen/kelola_absensi.php">Kelola Absensi</a>
+            <a href="../dosen/index.php">Dashboard</a>
+            <a href="../dosen/kelola_mahasiswa.php">Kelola Mahasiswa</a>
+            <a href="../dosen/kelola_mk.php">Kelola MatKul</a>
+            <a href="../dosen/kelola_absensi.php">Kelola Absensi</a>
         <?php elseif ($current_role == 'mahasiswa'): ?>
-            <a href="/sistem-absensi/mahasiswa/index.php">Dashboard</a>
-            <a href="/sistem-absensi/mahasiswa/isi_absensi.php">Isi Absensi</a>
-            <a href="/sistem-absensi/mahasiswa/riwayat.php">Riwayat Absensi</a>
+            <a href="../mahasiswa/index.php">Dashboard</a>
+            <a href="../mahasiswa/isi_absensi.php">Isi Absensi</a>
+            <a href="../mahasiswa/riwayat.php">Riwayat Absensi</a>
         <?php else: ?>
-            <a href="/sistem-absensi/auth/login.php">Login</a>
+            <a href="../auth/login.php">Login</a>
         <?php endif; ?>
     </div>
     <div>
         <?php if ($current_user): ?>
             <span class="user-info">Halo, <?= htmlspecialchars($current_user['display_name']) ?> (<?= $current_role ?>)</span>
-            <a href="/sistem-absensi/auth/logout.php" class="logout">Logout</a>
+            <a href="../auth/logout.php" class="logout">Logout</a>
         <?php endif; ?>
     </div>
 </nav>
