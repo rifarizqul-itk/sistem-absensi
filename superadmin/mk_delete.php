@@ -7,13 +7,13 @@ if (isset($_GET['id'])) {
     try {
         $stmt = $pdo->prepare("DELETE FROM mata_kuliah WHERE id_mk = ?");
         $stmt->execute([$id_mk]);
-        header("Location: kelola_mk.php?status=deleted");
+        header("Location: mk_read.php?status=deleted");
         exit;
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
 } else {
-    header("Location: kelola_mk.php");
+    header("Location: mk_read.php");
     exit;
 }
 ?>

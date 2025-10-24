@@ -13,7 +13,7 @@ $mk_list = $stmt->fetchAll();
 
 <h2>Kelola Mata Kuliah</h2>
 <hr>
-<a href="tambah_mk.php" class="btn btn-success">Tambah Mata Kuliah Baru</a>
+<a href="mk_create.php" class="btn btn-success">Tambah Mata Kuliah Baru</a>
 
 <?php
 if (isset($_GET['status']) && $_GET['status'] == 'success') {
@@ -41,8 +41,8 @@ if (isset($_GET['status']) && $_GET['status'] == 'deleted') {
                 <td><?= htmlspecialchars($mk['nama_dosen'] ?? 'N/A') ?></td>
                 <td class="actions">
                     <a href="kelola_krs.php?id_mk=<?= $mk['id_mk'] ?>" class="btn btn-warning">Kelola Peserta</a>
-                    <a href="edit_mk.php?id=<?= $mk['id_mk'] ?>" class="btn btn-secondary">Edit</a>
-                    <a href="hapus_mk.php?id=<?= $mk['id_mk'] ?>" class="btn btn-danger" onclick="return confirm('Yakin?')">Hapus</a>
+                    <a href="mk_update.php?id=<?= $mk['id_mk'] ?>" class="btn btn-secondary">Edit</a>
+                    <a href="mk_delete.php?id=<?= $mk['id_mk'] ?>" class="btn btn-danger" onclick="return confirm('Yakin?')">Hapus</a>
                 </td>
             </tr>
         <?php endforeach; ?>

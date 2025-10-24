@@ -4,7 +4,7 @@ check_auth('superadmin');
 $error = '';
 
 if (!isset($_GET['id'])) {
-    header("Location: kelola_mk.php");
+    header("Location: mk_read.php");
     exit;
 }
 $id_mk = $_GET['id'];
@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         try {
             $stmt = $pdo->prepare("UPDATE mata_kuliah SET kode_mk = ?, nama_mk = ?, id_dosen_pengampu = ? WHERE id_mk = ?");
             $stmt->execute([$kode_mk, $nama_mk, $id_dosen_pengampu, $id_mk]);
-            header("Location: kelola_mk.php?status=success");
+            header("Location: mk_read.php?status=success");
             exit;
         } catch (PDOException $e) {
             $error = 'Kode MK sudah terdaftar.';
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute([$id_mk]);
     $mk = $stmt->fetch();
     if (!$mk) {
-        header("Location: kelola_mk.php");
+        header("Location: mk_read.php");
         exit;
     }
 }
@@ -42,13 +42,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <h2>Edit Mata Kuliah: <?= htmlspecialchars($mk['nama_mk']) ?></h2>
 <hr>
-<a href="kelola_mk.php" class="btn btn-secondary">Kembali</a>
+<a href="mk_read.php" class="btn btn-secondary">Kembali</a>
 
 <?php if ($error): ?>
     <div class="alert alert-danger" style="margin-top: 15px;"><?= $error ?></div>
 <?php endif; ?>
 
-<form action="edit_mk.php?id=<?= $id_mk ?>" method="POST" style="margin-top: 15px;">
+<form action="mk_update.php?id=<?= $id_mk ?>" method="POST" style="margin-top: 15px;">
     <div class="form-group">
         <label for="kode_mk">Kode MK</label>
         <input type="text" id="kode_mk" name="kode_mk" required value="<?= htmlspecialchars($mk['kode_mk']) ?>">

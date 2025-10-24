@@ -58,7 +58,7 @@ function check_auth($role = null) {
     <div>
         <?php if ($current_role == 'superadmin'): ?>
             <a href="../superadmin/index.php">Dashboard</a>
-            <a href="../superadmin/kelola_mk.php">Kelola Mata Kuliah</a>
+            <a href="../superadmin/mk_read.php">Kelola Mata Kuliah</a>
             <a href="../superadmin/kelola_absensi.php">Kelola Absensi</a>
         <?php elseif ($current_role == 'dosen'): ?>
             <a href="../dosen/index.php">Dashboard</a>

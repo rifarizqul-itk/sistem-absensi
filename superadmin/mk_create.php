@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         try {
             $stmt = $pdo->prepare("INSERT INTO mata_kuliah (kode_mk, nama_mk, id_dosen_pengampu) VALUES (?, ?, ?)");
             $stmt->execute([$kode_mk, $nama_mk, $id_dosen_pengampu]);
-            header("Location: kelola_mk.php?status=success");
+            header("Location: mk_read.php?status=success");
             exit;
         } catch (PDOException $e) {
             $error = 'Kode MK sudah terdaftar.';
@@ -27,13 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <h2>Tambah Mata Kuliah Baru</h2>
 <hr>
-<a href="kelola_mk.php" class="btn btn-secondary">Kembali</a>
+<a href="mk_read.php" class="btn btn-secondary">Kembali</a>
 
 <?php if ($error): ?>
     <div class="alert alert-danger" style="margin-top: 15px;"><?= $error ?></div>
 <?php endif; ?>
 
-<form action="tambah_mk.php" method="POST" style="margin-top: 15px;">
+<form action="mk_create.php" method="POST" style="margin-top: 15px;">
     <div class="form-group">
         <label for="kode_mk">Kode MK</label>
         <input type="text" id="kode_mk" name="kode_mk" required>

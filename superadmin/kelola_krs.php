@@ -3,25 +3,23 @@ require __DIR__ . '/../templates/header.php';
 check_auth('superadmin');
 
 if (!isset($_GET['id_mk'])) {
-    header("Location: kelola_mk.php");
+    header("Location: mk_read.php");
     exit;
 }
 $id_mk = $_GET['id_mk'];
 
-// Ambil info MK
 $stmt_mk = $pdo->prepare("SELECT * FROM mata_kuliah WHERE id_mk = ?");
 $stmt_mk->execute([$id_mk]);
 $mk = $stmt_mk->fetch();
 
 if (!$mk) {
-    header("Location: kelola_mk.php");
+    header("Location: mk_read.php");
     exit;
 }
 
 $error = '';
 $success = '';
 
-// Logika Tambah Peserta
 if (isset($_POST['action']) && $_POST['action'] == 'tambah') {
     $id_mahasiswa = $_POST['id_mahasiswa'];
     if (!empty($id_mahasiswa)) {
@@ -35,13 +33,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'tambah') {
     }
 }
 
-// Logika Hapus Peserta
 if (isset($_GET['action']) && $_GET['action'] == 'hapus' && isset($_GET['id_mhs'])) {
     $id_mahasiswa = $_GET['id_mhs'];
     $stmt_del = $pdo->prepare("DELETE FROM peserta_mk WHERE id_mahasiswa = ? AND id_mk = ?");
     $stmt_del->execute([$id_mahasiswa, $id_mk]);
     $success = "Mahasiswa berhasil dihapus dari mata kuliah.";
-    // Redirect untuk membersihkan URL
     header("Location: kelola_krs.php?id_mk=$id_mk&status=deleted");
     exit;
 }
@@ -51,8 +47,6 @@ if (isset($_GET['status']) && $_GET['status'] == 'deleted') {
 }
 
 
-// Ambil 2 daftar mahasiswa:
-// 1. Yang sudah terdaftar
 $stmt_terdaftar = $pdo->prepare("
     SELECT m.id_mahasiswa, m.nim, m.nama_lengkap 
     FROM mahasiswa m
@@ -63,7 +57,6 @@ $stmt_terdaftar = $pdo->prepare("
 $stmt_terdaftar->execute([$id_mk]);
 $mahasiswa_terdaftar = $stmt_terdaftar->fetchAll();
 
-// 2. Yang belum terdaftar
 $stmt_belum = $pdo->prepare("
     SELECT m.id_mahasiswa, m.nim, m.nama_lengkap
     FROM mahasiswa m
@@ -80,7 +73,7 @@ $mahasiswa_belum_terdaftar = $stmt_belum->fetchAll();
 <h2>Kelola Peserta Mata Kuliah</h2>
 <h3><?= htmlspecialchars($mk['nama_mk']) ?> (<?= htmlspecialchars($mk['kode_mk']) ?>)</h3>
 <hr>
-<a href="kelola_mk.php" class="btn btn-secondary">Kembali ke Daftar MK</a>
+<a href="mk_read.php" class="btn btn-secondary">Kembali ke Daftar MK</a>
 
 <?php if ($error): ?>
     <div class="alert alert-danger" style="margin-top: 15px;"><?= $error ?></div>

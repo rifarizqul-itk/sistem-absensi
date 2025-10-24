@@ -1,11 +1,10 @@
 <?php
 require __DIR__ . '/../templates/header.php';
-check_auth('superadmin'); // Cek Super Admin
+check_auth('superadmin');
 
 $error = '';
 $success = '';
 
-// Logika "UPSERT" (Update atau Insert)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
     $tanggal = $_POST['tanggal'];
     $id_mk = $_POST['id_mk'];
@@ -18,31 +17,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
                 $keterangan = $data['keterangan'];
                 $id_absensi = $data['id_absensi']; 
 
-                // --- INI LOGIKA BARUNYA ---
                 if (empty($status)) {
-                    // Jika user memilih '-- Belum Absen --' (status kosong)
-                    // Kita harus HAPUS data absensi yang ada di DB.
                     if (!empty($id_absensi)) {
-                        // Hanya hapus jika ada $id_absensi (datanya ada)
                         $stmt_delete = $pdo->prepare("DELETE FROM absensi WHERE id_absensi = ?");
                         $stmt_delete->execute([$id_absensi]);
                     }
-                    // Setelah dihapus (atau jika memang kosong), lanjutkan
                     continue;
                 }
-                // --- AKHIR LOGIKA BARU ---
 
-                // Jika status TIDAK KOSONG (Hadir, Izin, Sakit, Alpa),
-                // jalankan logika UPSERT seperti biasa.
                 if (empty($id_absensi)) {
-                    // INSERT baru
                     $stmt_insert = $pdo->prepare(
                         "INSERT INTO absensi (id_mahasiswa, id_mk, tanggal_absensi, status, keterangan) 
                          VALUES (?, ?, ?, ?, ?)"
                     );
                     $stmt_insert->execute([$id_mahasiswa, $id_mk, $tanggal, $status, $keterangan]);
                 } else {
-                    // UPDATE yang ada
                     $stmt_update = $pdo->prepare(
                         "UPDATE absensi SET status = ?, keterangan = ? 
                          WHERE id_absensi = ?"
@@ -52,25 +41,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
             }
             $pdo->commit();
             $success = "Data absensi berhasil disimpan!";
-        // ... (sisa kode catch) ...
     } catch (Exception $e) {
         $pdo->rollBack();
         $error = "Gagal menyimpan data: " . $e->getMessage();
     }
 }
 
-// Ambil filter (jika ada)
-$filter_tanggal = $_GET['tanggal'] ?? date('Y-m-d'); // Default hari ini
+$filter_tanggal = $_GET['tanggal'] ?? date('Y-m-d');
 $filter_mk = $_GET['id_mk'] ?? '';
 
-// Ambil daftar MK untuk filter
-// INI PERBEDAANNYA: Ambil SEMUA mata kuliah
 $stmt_mk_list = $pdo->query("SELECT * FROM mata_kuliah ORDER BY nama_mk");
 $mk_list = $stmt_mk_list->fetchAll();
 
 $absensi_list = [];
 if (!empty($filter_mk) && !empty($filter_tanggal)) {
-    // Kueri utama: Ambil semua peserta MK, lalu LEFT JOIN absensi
     $stmt_absensi = $pdo->prepare("
         SELECT 
             m.id_mahasiswa, m.nim, m.nama_lengkap,
@@ -88,7 +72,7 @@ if (!empty($filter_mk) && !empty($filter_tanggal)) {
 }
 ?>
 
-<h2>Kelola Absensi Mahasiswa (Akses Super Admin)</h2>
+<h2>Kelola Absensi Mahasiswa (Akses Admin)</h2>
 <hr>
 
 <?php if ($error): ?>
