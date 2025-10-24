@@ -7,112 +7,6 @@ body {
     color: #333;
 }
 
-body.login-page {
-    background-color: #003584; /* Latar belakang biru tua */
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.login-wrapper {
-    width: 100%;
-    max-width: 400px;
-}
-
-.login-box {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    width: 100%;
-}
-
-.login-header {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.login-header h2 {
-    color: #333;
-    font-size: 24px;
-    margin: 0 0 5px 0;
-}
-
-.login-header p {
-    color: #777;
-    font-size: 14px;
-    margin: 0;
-}
-
-.login-error {
-    color: #c41f13; /* Merah untuk error */
-    font-size: 14px;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.login-box .form-group {
-    margin-bottom: 20px;
-}
-
-.login-box .form-group label {
-    display: block;
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-.login-box .form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box; /* Pastikan padding tidak merusak lebar */
-    font-size: 16px;
-}
-
-.btn-masuk {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background-color: #2439d4; /* Warna tombol merah */
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-masuk:hover {
-    background-color: #d13030;
-}
-
-.forgot-password {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #007bff;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-.login-footer {
-    text-align: center;
-    margin-top: 25px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
-}
 /* Navigasi */
 nav {
     background-color: #005a9c;
@@ -220,3 +114,104 @@ table .actions a {
 }
 .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
 .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+
+/* --- Tambahkan kode ini di paling bawah style.css --- */
+
+/* Style untuk Halaman Login */
+body.login-page {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 0; /* Hapus padding default di body */
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-box {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.login-header h2 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.login-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Style untuk Form Login */
+.login-box .form-group {
+    width: 100%;
+}
+
+.login-box .form-group label {
+    font-size: 14px;
+}
+
+.login-box .form-group input {
+    padding: 12px; /* Buat lebih besar */
+}
+
+/* Tombol Masuk Baru */
+.btn-masuk {
+    background-color: #005a9c; /* Biru yang sama dengan nav */
+    color: white;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    display: block; /* Buat jadi full width */
+    width: 100%;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+.btn-masuk:hover {
+    background-color: #004170;
+}
+
+/* Link Lupa Password */
+.forgot-password {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #005a9c;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Style Error Login */
+.login-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+}

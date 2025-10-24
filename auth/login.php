@@ -1,34 +1,67 @@
-<?php require __DIR__ . '/../templates/header.php'; ?>
-
-<h2>Login Sistem Absensi</h2>
-<hr>
-
 <?php
-// Tampilkan pesan error jika ada
-if (isset($_GET['error'])) {
-    $error = $_GET['error'];
-    $message = 'Terjadi kesalahan.';
-    if ($error == 'invalid') {
-        $message = 'Login ID atau password salah.';
-    } elseif ($error == 'not_logged_in') {
-        $message = 'Anda harus login untuk mengakses halaman ini.';
-    } elseif ($error == 'unauthorized') {
-        $message = 'Anda tidak memiliki hak akses ke halaman tersebut.';
+session_start();
+// Arahkan jika sudah login (SESUAI LOGIKA BARU KITA)
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] == 'superadmin') {
+        header('Location: ../superadmin/index.php');
+        exit;
+    } elseif ($_SESSION['role'] == 'dosen') {
+        header('Location: ../dosen/index.php');
+        exit;
+    } elseif ($_SESSION['role'] == 'mahasiswa') {
+        header('Location: ../mahasiswa/index.php');
+        exit;
     }
-    echo '<div class="alert alert-danger">' . $message . '</div>';
 }
 ?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi - Login</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="login-page"> <div class="login-wrapper">
+        <div class="login-box">
+            
+            <div class="login-header">
+                <h2>Absensi Mahasiswa</h2>
+                <p>Silahkan masukkan data login Anda!</p>
+            </div>
 
-<form action="proses_login.php" method="POST">
-    <div class="form-group">
-        <label for="login_id">Email</label>
-        <input type="text" id="login_id" name="login_id" required>
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <button type="submit" class="btn">Login</button>
-</form>
+            <?php
+            if (isset($_GET['error'])) {
+                $error = $_GET['error'];
+                $message = 'Terjadi kesalahan.';
+                if ($error == 'invalid') {
+                    $message = 'Login ID atau password salah.';
+                } elseif ($error == 'not_logged_in') {
+                    $message = 'Anda harus login untuk mengakses halaman ini.';
+                } elseif ($error == 'unauthorized') {
+                    $message = 'Anda tidak memiliki hak akses ke halaman tersebut.';
+                } elseif ($error == 'data_sync') {
+                    $message = 'Data akun Anda tidak sinkron. Hubungi Super Admin.';
+                }
+                // Tampilkan error di dalam style baru
+                echo '<p class="login-error">' . htmlspecialchars($message) . '</p>';
+            }
+            ?>
 
-<?php require __DIR__ . '/../templates/footer.php'; ?>
+            <form action="proses_login.php" method="POST">
+                <div class="form-group">
+                    <label for="login_id">Email</label>
+                    <input type="text" id="login_id" name="login_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn-masuk">Masuk</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

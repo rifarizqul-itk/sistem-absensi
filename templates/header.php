@@ -22,7 +22,7 @@ if (isset($_SESSION['id_user'])) {
         $current_user['display_name'] = $current_user['nama_lengkap'];
 
     } elseif ($current_role == 'superadmin') {
-        $current_user['display_name'] = 'Super Admin';
+        $current_user['display_name'] = 'Admin';
     }
 }
 
@@ -58,8 +58,6 @@ function check_auth($role = null) {
     <div>
         <?php if ($current_role == 'superadmin'): ?>
             <a href="../superadmin/index.php">Dashboard</a>
-            <a href="../superadmin/kelola_mahasiswa.php">Kelola Mahasiswa</a>
-            <a href="../superadmin/kelola_dosen.php">Kelola Dosen</a>
             <a href="../superadmin/kelola_mk.php">Kelola Mata Kuliah</a>
             <a href="../superadmin/kelola_absensi.php">Kelola Absensi</a>
         <?php elseif ($current_role == 'dosen'): ?>

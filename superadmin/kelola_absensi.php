@@ -13,31 +13,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
 
     $pdo->beginTransaction();
     try {
-        foreach ($mahasiswa_data as $id_mahasiswa => $data) {
-            $status = $data['status'];
-            $keterangan = $data['keterangan'];
-            $id_absensi = $data['id_absensi']; // Bisa kosong jika data baru
+            foreach ($mahasiswa_data as $id_mahasiswa => $data) {
+                $status = $data['status'];
+                $keterangan = $data['keterangan'];
+                $id_absensi = $data['id_absensi']; 
 
-            if (empty($status)) continue; // Lewati jika status tidak diisi
+                // --- INI LOGIKA BARUNYA ---
+                if (empty($status)) {
+                    // Jika user memilih '-- Belum Absen --' (status kosong)
+                    // Kita harus HAPUS data absensi yang ada di DB.
+                    if (!empty($id_absensi)) {
+                        // Hanya hapus jika ada $id_absensi (datanya ada)
+                        $stmt_delete = $pdo->prepare("DELETE FROM absensi WHERE id_absensi = ?");
+                        $stmt_delete->execute([$id_absensi]);
+                    }
+                    // Setelah dihapus (atau jika memang kosong), lanjutkan
+                    continue;
+                }
+                // --- AKHIR LOGIKA BARU ---
 
-            if (empty($id_absensi)) {
-                // INSERT baru
-                $stmt_insert = $pdo->prepare(
-                    "INSERT INTO absensi (id_mahasiswa, id_mk, tanggal_absensi, status, keterangan) 
-                     VALUES (?, ?, ?, ?, ?)"
-                );
-                $stmt_insert->execute([$id_mahasiswa, $id_mk, $tanggal, $status, $keterangan]);
-            } else {
-                // UPDATE yang ada
-                $stmt_update = $pdo->prepare(
-                    "UPDATE absensi SET status = ?, keterangan = ? 
-                     WHERE id_absensi = ?"
-                );
-                $stmt_update->execute([$status, $keterangan, $id_absensi]);
+                // Jika status TIDAK KOSONG (Hadir, Izin, Sakit, Alpa),
+                // jalankan logika UPSERT seperti biasa.
+                if (empty($id_absensi)) {
+                    // INSERT baru
+                    $stmt_insert = $pdo->prepare(
+                        "INSERT INTO absensi (id_mahasiswa, id_mk, tanggal_absensi, status, keterangan) 
+                         VALUES (?, ?, ?, ?, ?)"
+                    );
+                    $stmt_insert->execute([$id_mahasiswa, $id_mk, $tanggal, $status, $keterangan]);
+                } else {
+                    // UPDATE yang ada
+                    $stmt_update = $pdo->prepare(
+                        "UPDATE absensi SET status = ?, keterangan = ? 
+                         WHERE id_absensi = ?"
+                    );
+                    $stmt_update->execute([$status, $keterangan, $id_absensi]);
+                }
             }
-        }
-        $pdo->commit();
-        $success = "Data absensi berhasil disimpan!";
+            $pdo->commit();
+            $success = "Data absensi berhasil disimpan!";
+        // ... (sisa kode catch) ...
     } catch (Exception $e) {
         $pdo->rollBack();
         $error = "Gagal menyimpan data: " . $e->getMessage();

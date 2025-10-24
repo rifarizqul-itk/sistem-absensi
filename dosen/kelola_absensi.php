@@ -25,7 +25,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahasiswa'])) {
                 $keterangan = $data['keterangan'];
                 $id_absensi = $data['id_absensi']; 
 
-                if (empty($status)) continue;
+                if (empty($status)) {
+                    if (!empty($id_absensi)) {
+                        $stmt_delete = $pdo->prepare("DELETE FROM absensi WHERE id_absensi = ?");
+                        $stmt_delete->execute([$id_absensi]);
+                    }
+
+                    continue;
+                }
 
                 if (empty($id_absensi)) {
                     $stmt_insert = $pdo->prepare(
